@@ -1,13 +1,17 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import ReactDOM from "react-dom"
 
 const Most = (props) => {
-  let most = 0
-  for (let i = 0; i < props.votes.length; i++) {
-    if (props.votes[i] > props.votes[most]) {
-      most = i
+  const [most, setMost] = useState(0)
+  useEffect(() => {
+    let i
+    for (i = 0; i < props.votes.length; i++) {
+      if (props.votes[i] > props.votes[most]) {
+        setMost(i)
+        break
+      }
     }
-  }
+  })
   return (
     <>
       <p>{props.anecdotes[most]}</p>
@@ -25,7 +29,14 @@ const App = (props) => {
     "Premature optimization is the root of all evil.",
     "Debugging is twice as hard as writing the code in the first place. Therefore, if you write the code as cleverly as possible, you are, by definition, not smart enough to debug it.",
   ]
-  const [votes, setVotes] = useState(new Array(anecdotes.length).fill(0))
+  const makeEmptyArray = (l) => {
+    let arr = []
+    for (let i = 0; i < l; i++) {
+      arr.push(0)
+    }
+    return arr
+  }
+  const [votes, setVotes] = useState(makeEmptyArray(anecdotes.length))
   return (
     <div>
       <h1>Anecdote of the day</h1>
@@ -33,7 +44,7 @@ const App = (props) => {
       <p>has {votes[selected]} votes</p>
       <button
         onClick={() => {
-          const copy = { ...votes }
+          const copy = [...votes]
           copy[selected] += 1
           setVotes(copy)
         }}>
@@ -46,7 +57,7 @@ const App = (props) => {
         next anecdote
       </button>
       <h1>Anecdote with most votes</h1>
-      <Most votes={votes} anecdotes={anecdotes}/>
+      <Most votes={votes} anecdotes={anecdotes} />
     </div>
   )
 }
