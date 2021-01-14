@@ -3,25 +3,12 @@ import axios from "axios"
 import key from "../key"
 
 const Flag = ({ link }) => {
-  const [svg, setSvg] = useState({})
-  useEffect(() => {
-    axios.get(link).then((res) => {
-      console.log("flag",res.data)
-      setSvg(res.data)
-    })
-  })
-  return <div dangerouslySetInnerHTML={{ __html: svg }}></div>
+  return <img src={link} width='100px' height='100px' />
+  //return <div dangerouslySetInnerHTML={{ __html: svg }}></div>
 }
-//cors error
+
 const Png = ({ link }) => {
-  const [svg, setSvg] = useState({})
-  useEffect(() => {
-    axios.get(link).then((res) => {
-      console.log("png",res.data)
-      setSvg(res.data)
-    })
-  })
-  return <div dangerouslySetInnerHTML={{ __html: svg }}></div>
+  return <img src={link} width='100px' height='100px' />
 }
 const Weather = ({ name }) => {
   const [weather, setWeather] = useState({})
@@ -31,7 +18,6 @@ const Weather = ({ name }) => {
         `http://api.weatherstack.com/current?access_key=${key.key}&query=${name}`
       )
       .then((res) => {
-        console.log("res", res)
         setWeather(res.data)
       })
   }, [])
