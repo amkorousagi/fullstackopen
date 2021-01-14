@@ -22,22 +22,17 @@ const create = (newObject) => {
 
 const deleteObject = async (id) => {
   let promise
-  try {
-    promise = await axios.delete(baseUrl + "/" + id)
-    console.log(promise)
-    return promise.data
-  } catch (err) {
-    console.log(err.toString())
-  }
+  promise = await axios.delete(baseUrl + "/" + id)
+  console.log(promise)
+  return promise.data
 }
 const update = async (newObject) => {
   let promise
-  try{
+  try {
     promise = await axios.put(baseUrl + "/" + newObject.id, newObject)
     console.log("update! ", promise)
     return promise.data
-
-  } catch(err){
+  } catch (err) {
     console.log(err.toString())
   }
 }
