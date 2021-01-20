@@ -29,8 +29,12 @@ let persons = [
 app.use(express.json())
 app.use(cors())
 //ex3_7 and ex3_8
-morgan.token("body", (req,res)=>{return JSON.stringify(req.body)})
-app.use(morgan(":method :url :status :res[content-length] - :response-time ms :body"))
+morgan.token("body", (req, res) => {
+  return JSON.stringify(req.body)
+})
+app.use(
+  morgan(":method :url :status :res[content-length] - :response-time ms :body")
+)
 
 //ex3_1
 app.get("/api/persons", (request, response) => {
@@ -82,11 +86,11 @@ app.post("/api/persons", (req, res) => {
   console.log(body)
   body.id = getRandomId()
   if (body.name === undefined || body.number === undefined) {
-    return res.status(400).json({"error":"name or number is missing"})
+    return res.status(400).json({ error: "name or number is missing" })
   }
 
   if (persons.find((p) => p.name === body.name)) {
-    return res.status(400).json({"error":"name must be unique"})
+    return res.status(400).json({ error: "name must be unique" })
   }
 
   persons = persons.concat(body)
