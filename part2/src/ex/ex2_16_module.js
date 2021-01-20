@@ -1,5 +1,5 @@
 import axios from "axios"
-const baseUrl = "http://3.14.3.74:3001/persons"
+const baseUrl = "3.14.3.74:3001/persons"
 
 const getAll = async () => {
   let promise
