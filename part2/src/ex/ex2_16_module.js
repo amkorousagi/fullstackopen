@@ -1,6 +1,6 @@
 import axios from "axios"
-const baseUrl = "http://3.14.3.74:3001/api/persons"
-
+//const baseUrl = "http://3.14.3.74:3001/api/persons"
+const baseUrl = "http://localhost:3001/api/persons"
 const getAll = async () => {
   let promise
   try {
