@@ -6,7 +6,7 @@ const Notification = ({ message, isError }) => {
     return null
   }
   const notiStyle = {
-    color: isError == null ? "green" : "red",
+    color: isError ? "red" : "green",
     background: "lightgrey",
     fontSize: "20px",
     borderStyle: "solid",
@@ -107,10 +107,18 @@ const App = () => {
               }
             })
           )
-          setNewName("")
-          setNewPhone("")
-          setMessage(`Success update number about "${newObject.name}"`)
-          setIsError(false)
+            .then((res) => {
+              setNewName("")
+              setNewPhone("")
+              setMessage(`Success update number about "${newObject.name}"`)
+              setIsError(false)
+            })
+            .catch((err) => {
+              setNewName("")
+              setNewPhone("")
+              setMessage(`failed update number about "${newObject.name}"`)
+              setIsError(true)
+            })
         })
       }
     } else {
@@ -129,7 +137,12 @@ const App = () => {
           setMessage(`Success create person "${newObject.name}"`)
           setIsError(false)
         })
-        .catch((err) => console.log(err.toString()))
+        .catch((err) => {
+          setNewName("")
+          setNewPhone("")
+          setMessage(`failed create person "${newObject.name}"`)
+          setIsError(true)
+        })
     }
   }
   const deletePerson = (e, id) => {
@@ -142,7 +155,10 @@ const App = () => {
           setMessage(`Success delete person ${id}`)
           setIsError(false)
         })
-        .catch((err) => setMessage(err.toString() + " " + id))
+        .catch((err) => {
+          setMessage(err.toString() + " " + id)
+          setIsError(true)
+        })
     }
   }
 
@@ -154,7 +170,7 @@ const App = () => {
 
   return (
     <div>
-      <Notification message={message} />
+      <Notification message={message} isError={isError}/>
       <h2>Phonebook</h2>
       <Filter showWord={showWord} ShowWordHandler={ShowWordHandler} />
       <h2>add a new</h2>

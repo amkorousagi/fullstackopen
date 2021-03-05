@@ -1,3 +1,5 @@
+//3_21 -> http://localhost:3000/
+
 const express = require("express")
 const cors = require("cors")
 const morgan = require("morgan")
@@ -87,6 +89,8 @@ app.get("/info", (request, response) => {
   )
 })
 
+
+
 //ex3_3
 app.get("/api/persons/:id", (req, res, next) => {
   Person.findById(req.params.id)
@@ -104,6 +108,7 @@ app.get("/api/persons/:id", (req, res, next) => {
 app.delete("/api/persons/:id", (req, res, next) => {
   Person.findByIdAndRemove(req.params.id)
     .then((person) => {
+      console.log(person)
       res.status(204).end()
     })
     .catch((err) => next(err))
@@ -124,10 +129,11 @@ const getRandomId = () => {
 app.post("/api/persons", async (req, res, next) => {
   const body = req.body
   console.log(body)
+  /*
   if (body.name === undefined || body.number === undefined) {
     return res.status(400).json({ error: "name or number is missing" })
   }
-
+  */
   //promise chain required
   /*
   if (persons.find((p) => p.name === body.name)) {
@@ -145,9 +151,21 @@ app.post("/api/persons", async (req, res, next) => {
       })
       person
         .save()
-        .then((result) => res.json(result))
+        .then((result) => res.json(result.toJSON()))
         .catch((err) => next(err))
     } else {
+      /*
+      const person = new Person({
+        name: body.name,
+        number: body.number,
+      })
+      person
+        .save()
+        .then((result) => res.json(result.toJSON()))
+        .catch((err) => next(err))
+      //ex3_19
+      */
+
       let newReq = req
 
       newReq.url = `/api/persons/${result[0]._id}`
@@ -160,16 +178,19 @@ app.post("/api/persons", async (req, res, next) => {
 })
 
 app.put("/api/persons/:id", (req, res, next) => {
-  console.log("hi")
   const body = req.body
   const person = {
     name: body.name,
     number: body.number,
   }
-
-  Person.findByIdAndUpdate(req.params.id, person, { new: true })
+  console.log(person)
+  Person.findByIdAndUpdate(req.params.id, person, {
+    new: true,
+    runValidators: true,
+    context: 'query'
+  })
     .then((updatedObject) => {
-      res.json(updatedObject)
+      res.json(updatedObject.toJSON())
     })
     .catch((err) => next(err))
 })
@@ -185,6 +206,8 @@ const errorHandler = (error, req, res, next) => {
 
   if (error.name === "CastError") {
     return res.status(400).send({ error: "malformmatted id" })
+  } else if (error.name === "ValidationError") {
+    return res.status(400).json({ error: error.message })
   }
   next(error)
 }

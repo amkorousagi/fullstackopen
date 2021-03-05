@@ -6,7 +6,6 @@ const getAll = async () => {
   try {
     promise = await axios.get(baseUrl)
     console.log(promise.data)
-
     return promise.data
   } catch (err) {
     console.log(err.toString())
@@ -14,17 +13,25 @@ const getAll = async () => {
 }
 
 const create = (newObject) => {
-  return axios
-    .post(baseUrl, newObject)
-    .then((res) => res.data)
-    .catch((err) => console.log(err.toString()))
+  return axios.post(baseUrl, newObject).then((res) => res.data)
+  //.catch((err) => console.log("err ", err.toString()))
 }
 
 const deleteObject = async (id) => {
-  let promise
-  promise = await axios.delete(baseUrl + "/" + id)
-  console.log(promise)
-  return promise.data
+  return axios.delete(baseUrl + "/" + id).then((res) => {
+    if(res.status == 204){
+      console.log("err")
+      throw new Error("no content")
+    }
+    console.log(res)
+    return res.data
+  })
+  /*
+    let promise
+    promise = await axios.delete(baseUrl + "/" + id)
+    console.log(promise)
+    return promise.data
+    */
 }
 const update = async (newObject) => {
   let promise
