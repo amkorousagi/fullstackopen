@@ -9,18 +9,57 @@ blogsRouter.get("/", (req, res) => {
 })
 
 blogsRouter.post("/", (req, res, next) => {
-  const blog = new Blog(req.body)
+  //ex 4.11
+  if (req.body.likes == undefined) {
+    req.body.likes = 0
+  }
 
-  blog
-    .save()
-    .then((result) => {
-      if (result) {
-        res.status(201).json(result)
-      } else {
-        res.status(404).end()
+  if ((req.body.title == undefined) | (req.body.url == undefined)) {
+    res.status(400).end()
+  } else {
+    const blog = new Blog(req.body)
+    blog
+      .save()
+      .then((result) => {
+        if (result) {
+          res.status(201).json(result)
+        } else {
+          res.status(404).end()
+        }
+      })
+      .catch((err) => next(err))
+  }
+})
+
+blogsRouter.delete("/:id", async (req, res) => {
+  const isThere = await Blog.exists({ _id: req.params.id })
+  if (isThere) {
+    const blog = await Blog.deleteOne({ _id: req.params.id }, (err, res) => {
+      if (err) {
+        throw err
       }
+      return res
     })
-    .catch((err) => next(err))
+    res.status(200).json(blog)
+  } else {
+    res.status(400).end()
+  }
+})
+
+blogsRouter.patch("/:id", async (req, res) => {
+  const isThere = await Blog.exists({ _id: req.params.id })
+  if (isThere) {
+    const blog = await Blog.findOneAndUpdate(
+      { _id: req.params.id },
+      req.body,
+      (err, res) => {
+        return res
+      }
+    )
+    res.status(200).json(blog)
+  } else {
+    res.status(400).end()
+  }
 })
 
 module.exports = blogsRouter
