@@ -125,36 +125,79 @@ describe("http test post", () => {
 //ex 4.13
 describe("delete", () => {
   test("delete with a valid id", async () => {
-    const valid = await Blog.findOne({},(err,res)=>{return res})
-    await api.delete(
-      `/api/blogs/${valid._id}`
-    ).expect(200)
+    const valid = await Blog.findOne({}, (err, res) => {
+      return res
+    })
+    await api.delete(`/api/blogs/${valid._id}`).expect(200)
   })
 
   test("delete with an invalid id", async () => {
     const invalidId = "iminvlaidid"
-    const response = await api.delete(
-      `/api/blogs/${invalidId}`
-    ).expect(400)
+    const response = await api.delete(`/api/blogs/${invalidId}`).expect(400)
   })
 })
 
 //ex 4.14
-describe("update",()=>{
+describe("update", () => {
   test("update with a valid id", async () => {
-    const valid = await Blog.findOne({},(err,res)=>{return res})
-    const res = await api.patch(
-      `/api/blogs/${valid._id}`
-    ).send({url:"updated url"})
+    const valid = await Blog.findOne({}, (err, res) => {
+      return res
+    })
+    const res = await api
+      .patch(`/api/blogs/${valid._id}`)
+      .send({ url: "updated url" })
 
-    expect(res.body).toMatchObject({url:"updated url"})
+    expect(res.body).toMatchObject({ url: "updated url" })
   })
 
-  test.only("update with an invalid id", async () => {
+  test("update with an invalid id", async () => {
     const invalidId = "iminvlaidid"
-    const response = await api.delete(
-      `/api/blogs/${invalidId}`
-    ).expect(400)
+    const response = await api.delete(`/api/blogs/${invalidId}`).expect(400)
+  })
+})
+
+describe("authorization", async () => {
+  test("new blog success", async () => {
+    const userRes = await api.post("/api/users").send({
+      username: "myusername2",
+      password: "mypassword2",
+      name: "myname",
+    })
+
+    const loginRes = await api
+      .post("/api/login")
+      .send({ username: "myusername2", password: "mypassword2" })
+    console.log("token ", loginRes.body.token)
+    const blogRes = await api
+      .post("/api/blogs")
+      .set("Accept", "application/json")
+      .auth(loginRes.body.token, { type: "bearer" })
+      .send({ title: "a3", url: "a", likes: 7 })
+
+    console.log("blog ", blogRes.body)
+
+    expect(blogRes.body).toMatchObject({ username: "myusername2" })
+  })
+  test.only("new blog failed", async () => {
+    const userRes = await api.post("/api/users").send({
+      username: "myusername3",
+      password: "mypassword3",
+      name: "myname",
+    })
+
+    const loginRes = await api
+      .post("/api/login")
+      .send({ username: "myusername3", password: "mypassword3" })
+    console.log("token ", loginRes.body.token)
+    const blogRes = await api
+      .post("/api/blogs")
+      .set("Accept", "application/json")
+      .auth("invalid token", { type: "bearer" })
+      .send({ title: "a3", url: "a", likes: 7 })
+
+    console.log("blog ", blogRes.body)
+
+    expect(blogRes.status).toBe(401)
   })
 })
 afterAll(() => {
